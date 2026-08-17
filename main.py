@@ -19,7 +19,7 @@ from gradient_descent import (
 DATA_PATH = "data/california_housing_train.csv"
 FEATURES = ["total_rooms", "total_bedrooms", "population", "households", "median_income"]
 TARGET = "median_house_value"
-RANDOM_SEED = 42
+RANDOM_SEED = 18
 
 
 def main():
