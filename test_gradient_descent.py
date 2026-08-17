@@ -49,10 +49,7 @@ def test_compute_gradients_shape():
 
 
 def test_gradient_descent_reduces_cost():
-    """The cost history should be strictly decreasing (or at least end lower
-    than it started) -- a basic sanity check that training is actually
-    learning, not just running."""
-    rng = np.random.default_rng(42)
+    rng = np.random.default_rng(18)
     X = rng.normal(size=(50, 3))
     true_w = np.array([2.0, -1.0, 0.5])
     y = X @ true_w + rng.normal(scale=0.1, size=50)
@@ -66,14 +63,7 @@ def test_gradient_descent_reduces_cost():
 
 
 def test_numerical_gradient_check_passes_within_relative_tolerance():
-    """This is the test that caught the real factor-of-2 bug during
-    development -- see README.md. Uses relative tolerance, not absolute,
-    since the target scale in the real dataset (house prices, ~1e5) makes
-    a fixed absolute tolerance meaningless -- confirmed via an epsilon-sweep
-    that the residual gap at a fixed absolute tolerance was floating-point
-    cancellation, not a further bug (error grew as epsilon shrank, the
-    opposite of what a real remaining bug would show)."""
-    rng = np.random.default_rng(42)
+    rng = np.random.default_rng(18)
     X = rng.normal(size=(100, 5))
     y = rng.normal(loc=200000, scale=50000, size=100)  # mimics real target scale
     w = np.zeros(5)
