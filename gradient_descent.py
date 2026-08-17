@@ -10,47 +10,24 @@ import numpy as np
 
 
 def predict(X, w, b):
-    """Linear prediction: X @ w + b.
-
-    Parameters
-    ----------
-    X : ndarray, shape (m, n)
-    w : ndarray, shape (n,)
-    b : float
-
-    Returns
-    -------
-    ndarray, shape (m,)
-    """
     return np.dot(X, w) + b
 
 
 def mse(predictions, actual):
-    """Mean squared error."""
     return np.mean((predictions - actual) ** 2)
 
 
 def rmse(predictions, actual):
-    """Root mean squared error."""
     return np.sqrt(mse(predictions, actual))
 
 
 def r_squared(predictions, actual):
-    """Coefficient of determination."""
     ss_res = np.sum((actual - predictions) ** 2)
     ss_tot = np.sum((actual - np.mean(actual)) ** 2)
     return 1 - (ss_res / ss_tot)
 
 
 def compute_gradients(X, y, w, b):
-    """Analytical gradient of MSE with respect to w and b.
-
-    BUG FIX: an earlier version of this function computed (1/m)*X.T@error,
-    missing the factor of 2 that comes from differentiating the squared
-    error term in MSE = mean((Xw+b-y)^2). The true gradient is
-    (2/m)*X.T@error. This was caught by numerical_gradient_check() below --
-    every component was off by exactly 2x before the fix. See README.md.
-    """
     m = X.shape[0]
     predictions = predict(X, w, b)
     errors = predictions - y
@@ -60,7 +37,6 @@ def compute_gradients(X, y, w, b):
 
 
 def gradient_descent(X, y, w, b, alpha=0.01, iterations=2000):
-    """Batch gradient descent. Returns final (w, b, cost_history)."""
     cost_history = []
     for _ in range(iterations):
         db, dw = compute_gradients(X, y, w, b)
@@ -70,8 +46,7 @@ def gradient_descent(X, y, w, b, alpha=0.01, iterations=2000):
     return w, b, cost_history
 
 
-def train_test_split(X, y, test_size=0.2, seed=42):
-    """Simple random train/test split."""
+def train_test_split(X, y, test_size=0.2, seed=18):
     if not 0 < test_size < 1:
         raise ValueError("test_size must be between 0 and 1.")
     rng = np.random.default_rng(seed)
@@ -83,7 +58,6 @@ def train_test_split(X, y, test_size=0.2, seed=42):
 
 
 def standardize_train(X):
-    """Z-score standardization, fit on training data. Returns (X_scaled, mean, std)."""
     mean = np.mean(X, axis=0)
     std = np.std(X, axis=0)
     std = np.where(std == 0, 1, std)
@@ -91,13 +65,10 @@ def standardize_train(X):
 
 
 def standardize_test(X, mean, std):
-    """Apply training-set mean/std to test data -- never re-fit on test data."""
     return (X - mean) / std
 
 
-def k_fold_cross_validation(X, y, k=5, alpha=0.01, iterations=2000, seed=42):
-    """K-fold CV. Standardization is re-fit on each fold's training split only,
-    to avoid leaking validation-fold statistics into training."""
+def k_fold_cross_validation(X, y, k=5, alpha=0.01, iterations=2000, seed=18):
     rng = np.random.default_rng(seed)
     indices = rng.permutation(len(X))
     folds = np.array_split(indices, k)
@@ -123,12 +94,6 @@ def k_fold_cross_validation(X, y, k=5, alpha=0.01, iterations=2000, seed=42):
 
 
 def numerical_gradient_check(X, y, w, b, epsilon=1e-5):
-    """Finite-difference gradient check against the analytical gradient.
-
-    This is what caught the factor-of-2 bug during development -- every
-    component of the analytical gradient was off from the numerical
-    approximation by a consistent ratio of exactly 2x before the fix.
-    """
     analytical_db, analytical_dw = compute_gradients(X, y, w, b)
 
     numerical_dw = np.zeros(len(w))
@@ -151,7 +116,6 @@ def numerical_gradient_check(X, y, w, b, epsilon=1e-5):
 
 
 def baseline_prediction(y_train, y_test):
-    """Baseline: always predict the training mean."""
     return np.full(len(y_test), np.mean(y_train))
 
 
@@ -168,7 +132,6 @@ def evaluate_model(predictions, actual):
 
 
 def run_learning_rate_experiment(X_train, y_train, learning_rates, iterations=2000):
-    """Train with several learning rates, return final MSE and history for each."""
     results = {}
     for alpha in learning_rates:
         w = np.zeros(X_train.shape[1])
